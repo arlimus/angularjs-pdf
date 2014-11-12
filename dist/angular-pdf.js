@@ -90,14 +90,21 @@
           }
         };
 
-        PDFJS.getDocument(url).then(function(_pdfDoc) {
-          pdfDoc = _pdfDoc;
-          scope.renderPage(scope.pageToDisplay);
+        scope.loadPDF = function(options) {
+          if(!options) {
+            return;
+          }
+          return PDFJS.getDocument(options).then(function(_pdfDoc) {
+            pdfDoc = _pdfDoc;
+            scope.renderPage(scope.pageToDisplay);
 
-          scope.$apply(function() {
-            scope.pageCount = _pdfDoc.numPages;
+            scope.$apply(function() {
+              scope.pageCount = _pdfDoc.numPages;
+            });
           });
-        });
+        };
+
+        scope.loadPDF(url);
 
         scope.$watch('pageNum', function(newVal) {
           scope.pageToDisplay = parseInt(newVal);

@@ -106,6 +106,10 @@
 
         scope.loadPDF(url);
 
+        scope.getPDFDoc = function() {
+          return pdfDoc;
+        };
+
         scope.$watch('pageNum', function(newVal) {
           scope.pageToDisplay = parseInt(newVal);
           if (pdfDoc !== null) {

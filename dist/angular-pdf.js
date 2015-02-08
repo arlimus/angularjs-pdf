@@ -16,7 +16,8 @@
           scale = (attrs.scale ? attrs.scale : 1),
           canvas = (attrs.canvasid ? document.getElementById(attrs.canvasid) : document.getElementById('pdf-canvas')),
           ctx = canvas.getContext('2d'),
-          windowEl = angular.element($window);
+          windowEl = angular.element($window),
+          renderPromise = null;
 
         windowEl.on('scroll', function() {
           scope.$apply(function() {
@@ -41,7 +42,10 @@
               viewport: viewport
             };
 
-            page.render(renderContext);
+            // cancel the previous rendering task if it is still running
+            if(renderPromise != null && !renderPromise.promise.isFulfilled())
+              renderPromise.cancel()
+            renderPromise = page.render(renderContext);
           });
 
         };

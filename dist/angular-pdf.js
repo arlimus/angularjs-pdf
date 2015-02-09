@@ -13,11 +13,13 @@
         var url = scope.pdfUrl,
           pdfDoc = null,
           pageNum = 1,
-          scale = (attrs.scale ? attrs.scale : 1),
+          scale = (attrs.scale ? attrs.scale : "auto"),
+          scaleNumeric = null,
           canvas = (attrs.canvasid ? document.getElementById(attrs.canvasid) : document.getElementById('pdf-canvas')),
           ctx = canvas.getContext('2d'),
           windowEl = angular.element($window),
-          renderPromise = null;
+          renderPromise = null,
+          MAX_AUTO_SCALE = 1.25;
 
         windowEl.on('scroll', function() {
           scope.$apply(function() {
@@ -28,10 +30,37 @@
         PDFJS.disableWorker = true;
         scope.pageNum = pageNum;
 
-        scope.renderPage = function(num) {
+        function translateScale(scale, page) {
+          window.RARA = page;
+          if(scale > 0)
+            return scale;
+          // all non-numeric scale values
+          var w = page.view[2] - page.view[0]
+          var h = page.view[3] - page.view[1]
+          var pageWidthScale = element[0].parentElement.clientWidth / w;
+          var pageHeightScale = element[0].parentElement.clientHeight / h;
+          switch (scale) {
+            case 'page-width':
+              return pageWidthScale;
+            case 'page-height':
+              return pageHeightScale;
+            case 'page-fit':
+              return Math.min(pageWidthScale, pageHeightScale);
+            case 'auto':
+              var isLandscape = (w > h);
+              // fit the page to width in landscape, unless the page becomes too wide
+              var hScale = (isLandscape) ? Math.min(pageHeightScale, pageWidthScale) : pageWidthScale;
+              return Math.min(MAX_AUTO_SCALE, hScale);
+            default:
+              console.error('dont know how to scale to "'+scale+'".');
+              return 1;
+          }
+        }
 
+        scope.renderPage = function(num) {
           pdfDoc.getPage(num).then(function(page) {
-            var viewport = page.getViewport(scale),
+            scaleNumeric = translateScale(scale, page)
+            var viewport = page.getViewport(scaleNumeric),
               renderContext = {};
 
             canvas.height = viewport.height;
@@ -67,13 +96,13 @@
         };
 
         scope.zoomIn = function() {
-          scale = parseFloat(scale) + 0.2;
+          scale = parseFloat(scaleNumeric) + 0.2;
           scope.renderPage(scope.pageToDisplay);
           return scale;
         };
 
         scope.zoomOut = function() {
-          scale = parseFloat(scale) - 0.2;
+          scale = parseFloat(scaleNumeric) - 0.2;
           scope.renderPage(scope.pageToDisplay);
           return scale;
         };

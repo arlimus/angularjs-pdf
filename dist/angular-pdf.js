@@ -117,6 +117,10 @@
           return scale;
         };
 
+        scope.setPDFZoom = function(val) {
+          scale = val;
+        }
+
         scope.changePage = function() {
           scope.renderPage(scope.pageToDisplay);
         };

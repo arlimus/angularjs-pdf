@@ -1,4 +1,8 @@
 /*! Angular-PDF Version: 0.3.4 | (C) Sayanee Basu 2014, released under an MIT license */
+/*
+  Code for scaling inspired by:
+    https://github.com/mozilla/pdf.js/blob/master/web/viewer.js
+*/
 (function() {
 
   'use strict';
@@ -19,7 +23,9 @@
           ctx = canvas.getContext('2d'),
           windowEl = angular.element($window),
           renderPromise = null,
-          MAX_AUTO_SCALE = 1.25;
+          MAX_AUTO_SCALE = 1.25,
+          MIN_SCALE = 0.25,
+          MAX_SCALE = 10.0;
 
         windowEl.on('scroll', function() {
           scope.$apply(function() {
@@ -60,6 +66,10 @@
         scope.renderPage = function(num) {
           pdfDoc.getPage(num).then(function(page) {
             scaleNumeric = translateScale(scale, page)
+            if(scaleNumeric > MAX_SCALE)
+              scaleNumeric = MAX_SCALE;
+            if(scaleNumeric < MIN_SCALE)
+              scaleNumeric = MIN_SCALE;
             var viewport = page.getViewport(scaleNumeric),
               renderContext = {};
 

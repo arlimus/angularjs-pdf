@@ -121,6 +121,10 @@
           scale = val;
         }
 
+        scope.getPDFZoom = function () {
+          return parseFloat(scaleNumeric);
+        }
+
         scope.changePage = function() {
           scope.renderPage(scope.pageToDisplay);
         };

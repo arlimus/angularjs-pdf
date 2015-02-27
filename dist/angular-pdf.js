@@ -64,7 +64,7 @@
         }
 
         scope.renderPage = function(num) {
-          pdfDoc.getPage(num).then(function(page) {
+          return pdfDoc.getPage(num).then(function(page) {
             scaleNumeric = translateScale(scale, page)
             if(scaleNumeric > MAX_SCALE)
               scaleNumeric = MAX_SCALE;
@@ -107,14 +107,24 @@
 
         scope.zoomIn = function() {
           scale = parseFloat(scaleNumeric) + 0.2;
-          scope.renderPage(scope.pageToDisplay);
-          return scale;
+          return scope.renderPage(scope.pageToDisplay).then(function(){
+            return {
+              scale: scale,
+              height: canvas.height,
+              width: canvas.width
+            };
+          });
         };
 
         scope.zoomOut = function() {
           scale = parseFloat(scaleNumeric) - 0.2;
-          scope.renderPage(scope.pageToDisplay);
-          return scale;
+          return scope.renderPage(scope.pageToDisplay).then(function(){
+            return {
+              scale: scale,
+              height: canvas.height,
+              width: canvas.width
+            };
+          });
         };
 
         scope.setPDFZoom = function(val) {

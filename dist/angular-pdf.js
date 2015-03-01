@@ -53,22 +53,29 @@
           }
           var pageWidthScale = containerWidth / w;
           var pageHeightScale = containerHeight / h;
+          
+          var newScale = 0;
           switch (scale) {
             case 'page-width':
-              return pageWidthScale * 0.95;
+              newScale = pageWidthScale;
             case 'page-height':
-              return pageHeightScale * 0.95;
+              newScale = pageHeightScale;
             case 'page-fit':
-              return Math.min(pageWidthScale, pageHeightScale);
+              newScale = Math.min(pageWidthScale, pageHeightScale);
             case 'auto':
               var isLandscape = (w > h);
               // fit the page to width in landscape, unless the page becomes too wide
               var hScale = (isLandscape) ? Math.min(pageHeightScale, pageWidthScale) : pageWidthScale;
-              return Math.min(MAX_AUTO_SCALE, hScale);
+              newScale = Math.min(MAX_AUTO_SCALE, hScale);
             default:
               console.error('dont know how to scale to "'+scale+'".');
-              return 1;
+              newScale = 1;
           }
+
+          // sanitize zoom, fallback to 1
+          if (newScale === 0) newScale = 1;
+
+          return newScale
         }
 
         scope.renderPage = function(num) {

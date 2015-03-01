@@ -43,13 +43,21 @@
           // all non-numeric scale values
           var w = page.view[2] - page.view[0]
           var h = page.view[3] - page.view[1]
-          var pageWidthScale = element[0].parentElement.clientWidth / w;
-          var pageHeightScale = element[0].parentElement.clientHeight / h;
+          var containerWidth = 0;
+          var containerHeight = 0;
+          var curContainer = element[0];
+          while(containerWidth === 0 && curContainer != null) {
+            containerWidth = curContainer.clientWidth;
+            containerHeight = curContainer.clientHeight;
+            curContainer = curContainer.parentElement;
+          }
+          var pageWidthScale = containerWidth / w;
+          var pageHeightScale = containerHeight / h;
           switch (scale) {
             case 'page-width':
-              return pageWidthScale;
+              return pageWidthScale * 0.95;
             case 'page-height':
-              return pageHeightScale;
+              return pageHeightScale * 0.95;
             case 'page-fit':
               return Math.min(pageWidthScale, pageHeightScale);
             case 'auto':
